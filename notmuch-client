@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+# -*- python -*-
+
+from nmclient import NotmuchCommand, NotmuchClientConfig, CONFIG_LOCATIONS
+import sys
+import os
+
+if __name__ == "__main__":
+    for location in CONFIG_LOCATIONS:
+        if os.path.isfile(location):
+            nmconfig = NotmuchClientConfig(location)
+            break
+    if nmconfig.remote:
+        try:
+            if not os.path.isdir(nmconfig.cache):
+                os.mkdir(nmconfig.cache)
+        except OSError:
+            sys.stdout.write("Can't make cache file at %s" % nmconfig.cache)
+    args = sys.argv[1:]
+    command = NotmuchCommand.make_command(nmconfig, args)
+    output = command.run()
+    sys.stdout.write(output[0])
+    sys.stderr.write(output[1])
