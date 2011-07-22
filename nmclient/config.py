@@ -12,9 +12,10 @@ class NotmuchClientConfigError(Exception):
 
 class NotmuchClientConfig(object):
 
-    def __init__(self, configfile):
+    def __init__(self, configfile = None):
         self._config_parser = ConfigParser()
-        self._config_parser.read(configfile)
+        if configfile:
+            self._config_parser.read(configfile)
 
     @property
     def account(self):

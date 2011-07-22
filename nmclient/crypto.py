@@ -3,6 +3,9 @@ import tempfile
 import os
 from cStringIO import StringIO
 
+class NotmuchClientCryptoError(Exception):
+    pass
+
 def verify(multipart_signed_msg):
     parts = multipart_signed_msg.get_payload()
     data_part = parts[0]
@@ -31,5 +34,9 @@ def decrypt(multipart_encrypted_msg):
     decryption = gpg.decrypt(encrypted_part)
 
     return (decryption.valid, decryption.data)
+
+
+    
+
 
 

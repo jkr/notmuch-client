@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-from subprocess import Popen, PIPE
+from nmclient.shared import _run_command_locally, _run_command_over_ssh
+from nmclient.dates import DateRange
 from hashlib import sha1
 from email import message_from_file
 from itertools import islice
@@ -10,21 +11,6 @@ import sys
 
 class NotmuchCommandError(Exception):
     pass
-
-def _run_command_locally (nmconfig, command, args):
-    connection_commands = [nmconfig.notmuch_bin]
-    command_list = connection_commands + [command] + args
-    command = Popen(command_list, 
-                    stdin = PIPE, stdout = PIPE, stderr = PIPE)
-    return command.communicate()
-
-def _run_command_over_ssh (nmconfig, command, args):
-    connection_commands = [nmconfig.ssh_bin, nmconfig.user + "@" + nmconfig.server, nmconfig.notmuch_bin]
-    command_list = connection_commands + [command] + args
-    command = Popen(command_list, 
-                    stdin = PIPE, stdout = PIPE, stderr = PIPE)
-    return command.communicate()
-
 
 class NotmuchCommand (object):
 
@@ -39,9 +25,11 @@ class NotmuchCommand (object):
         
         cmd = args[0]
         arglist = args[1:]
-        if cmd in ("new", "search", "count", 
-                   "tag", "reply", "help", "config"):
+        if cmd in ("new", "count", "tag", 
+                   "reply", "help", "config"):
             return NotmuchGeneric(nmconfig, cmd, arglist)
+        elif cmd == "search":
+            return NotmuchSearch(nmconfig, arglist)
         elif cmd == "show":
             return NotmuchShow(nmconfig, arglist)
         else:
@@ -74,6 +62,25 @@ class NotmuchGeneric (NotmuchCommand):
     def __init__(self, nmconfig, command, args):
         super(NotmuchGeneric, self).__init__(nmconfig, args)
         self.command = command
+
+class NotmuchSearch (NotmuchCommand):
+    
+    def __init__(self, nmconfig, args):
+        super(NotmuchSearch, self).__init__(nmconfig, args)
+        self.command = "search"
+        self._modify_date_args()
+
+    def _modify_date_args(self):
+        new_arg_list = []
+        for arg in self.args:
+            for subarg in arg.split():
+                if subarg[:5] != "date:":
+                    new_arg_list.append(subarg)
+                else:
+                    date_range = DateRange.from_string_range(subarg[5:])
+                    new_arg_list.append(date_range.as_timestamp_range())
+        self.args = new_arg_list
+
 
 class NotmuchShow (NotmuchCommand):
 
@@ -137,21 +144,22 @@ class NotmuchShow (NotmuchCommand):
         filename_output = _run_command_locally(self.config, "search", ["--output=files"] + search_terms)
         return filename_output[0].strip().split('\n')[0]
 
-    def _run_raw(self):
+    def get_mail_file(self):
         if self.config.remote:
-            mail_file = self._get_cached_file()
+            return self._get_cached_file()
         else:
-            mail_file = self._get_local_file()
+            return self._get_local_file()
+
+
+    def _run_raw(self):
+        mail_file = self.get_mail_file()
         fp = open(mail_file)
         data = fp.read()
         fp.close()
         return data
 
     def _run_part(self):
-        if self.config.remote:
-            mail_file = self._get_cached_file()
-        else:
-            mail_file = self._get_local_file()
+        mail_file = self.get_mail_file()
         fp = open(mail_file)
         msg = message_from_file(fp)
         fp.close()
@@ -172,12 +180,19 @@ class NotmuchShow (NotmuchCommand):
         else:
             return part.get_payload(decode=True)
 
+    # def _run_decrypt(self):
+    #     mail_file = self.get_mail_file()
+        
+        
+
     def run (self):
         if self.partnum:
             return (self._run_part(), '')
         elif self.format == "raw":
             return (self._run_raw(), '')
-        else:
+        elif self.config.remote:
             return _run_command_over_ssh(self.config, self.command, self.args)
+        else:
+            return _run_command_locally(self.config, self.command, self.args)
 
 
