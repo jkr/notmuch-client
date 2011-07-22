@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-
-from __future__ import print_function
 from nmclient.shared import _run_command_locally, _run_command_over_ssh
 from nmclient.dates import DateRange
 from hashlib import sha1
@@ -73,6 +70,8 @@ class NotmuchSearch (NotmuchCommand):
     def _modify_date_args(self):
         new_arg_list = []
         for arg in self.args:
+            # We have to split the args up further, since the emacs
+            # client will quote them together.
             for subarg in arg.split():
                 if subarg[:5] != "date:":
                     new_arg_list.append(subarg)
@@ -167,9 +166,10 @@ class NotmuchShow (NotmuchCommand):
         msg_parts = msg.walk()
 
         # We need to deal with the fact that python's email parser
-        # skips the message mime-part at the top-level. I.e., there
-        # should be another part between the message and the toplevel
-        # mime part.
+        # skips the inital message mime-part at the top-level. I.e.,
+        # in python the toplevel is whatever the main part of the
+        # message is, and not the message itself. So we have to add an
+        # extra step in there.
         if self.partnum == 0:
             modified_partnum = 0
         else:
@@ -179,11 +179,6 @@ class NotmuchShow (NotmuchCommand):
             return part.as_string()
         else:
             return part.get_payload(decode=True)
-
-    # def _run_decrypt(self):
-    #     mail_file = self.get_mail_file()
-        
-        
 
     def run (self):
         if self.partnum:
