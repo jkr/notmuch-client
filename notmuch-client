@@ -11,7 +11,8 @@ if __name__ == "__main__":
         try:
             nmconfig = NotmuchClientConfig(CONFIG_LOCATION)
         except MissingSectionHeaderError:
-               sys.stderr.write("Couldn't read config file at %s\n. Aborting" % CONFIG_LOCATION)
+               sys.stderr.write("Couldn't read config file at %s\n. Aborting" % 
+                                CONFIG_LOCATION)
                sys.exit(1)
     else:
         nmconfig = NotmuchClientConfig()
