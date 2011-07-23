@@ -97,8 +97,8 @@ Current Enhancements
 
   * search:
 
-      + You can search for date ranges using the search prefix `date:`
-        and the syntax:
+      + You can search for **date ranges** using the search prefix
+        `date:` and the syntax:
             
             date:YYYY-M-D--YYYY-M-D
 
