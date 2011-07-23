@@ -14,6 +14,8 @@ if __name__ == "__main__":
                sys.stderr.write("Couldn't read config file at %s\n. Aborting"
                                 % CONFIG_LOCATION) 
                sys.exit(1)
+    else:
+        nmconfig = NotmuchClientConfig()
         
     if nmconfig.remote:
         try:
