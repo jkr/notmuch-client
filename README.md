@@ -19,13 +19,14 @@ The aims of notmuch-client
     wade into the notmuch sources. 
 
     One example: notmuch-client adds more convenient date ranges to
-    searching through the use of the `date:` search-term. More on this
-    below.
+    searching through the use of the `date:` search-term. See "Current
+    Enhancements" section below.
 
- 3. ...and note, this *not* implemented yet, but... To move decryption
-    and verification to client side during remote usage in order to
-    avoid having a key on numerous computers, and to remove the need
-    for any X-tunneled pinentry programes.
+
+ 3. ...and note, this is *not* implemented yet, but... To move
+    decryption and verification to client side during remote usage in
+    order to avoid having a key on numerous computers, and to remove
+    the need for any X-tunneled pinentry programs.
 
     (This part won't be *too* hard, but it will require replicating
     notmuch's undocumented JSON format, which might be something of a
@@ -90,6 +91,42 @@ Just add the installation folder to your path, and run
 `notmuch-client`.
 
 A future version will add distutils setup.
+
+Current Enhancements
+--------------------
+
+  * search:
+
+      + You can search for date ranges using the search prefix `date:`
+        and the syntax:
+            
+            date:YYYY-M-D--YYYY-M-D
+
+        Note that years and months are optional, though to avoid
+        ambiguity, you must enter a month if you enter a year. If year
+        or month is not specified in the beginning of the range, it
+        will default to the current year or month. If it is not
+        specified in the end of the range, it will default to the year
+        or month in the beginning of the range.
+
+        If either the first or last date is left off altogether, it
+        will default to a range between the beginning and end of time
+        (i.e. 1 Jan 1970 and today). (Today is not really the end of
+        time, don't worry.)
+
+        So, assuming that it's currently 23 July, 2011:
+
+           date:3-11--4-25
+
+        will mean the range between 2011-3-11 and 2011-4-25.
+
+           date:2009-3-11--4-25
+
+        will mean the range between 2009-3-11 and 2009-4-25.
+
+           date 2009-3-11--
+
+        will mean the range between 2009-3-11 and today.
 
 
 
