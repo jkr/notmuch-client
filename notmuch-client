@@ -1,15 +1,20 @@
 #!/usr/bin/env python
 # -*- python -*-
 
-from nmclient import NotmuchCommand, NotmuchClientConfig, CONFIG_LOCATIONS
+from nmclient import NotmuchCommand, NotmuchClientConfig, CONFIG_LOCATION
+from ConfigParser import MissingSectionHeaderError
 import sys
 import os
 
 if __name__ == "__main__":
-    for location in CONFIG_LOCATIONS:
-        if os.path.isfile(location):
-            nmconfig = NotmuchClientConfig(location)
-            break
+    if os.path.isfile(CONFIG_LOCATION):
+        try:
+            nmconfig = NotmuchClientConfig(CONFIG_LOCATION)
+        except MissingSectionHeaderError, \
+               sys.stderr.write("Couldn't read config file at %s\n. Aborting"
+                                % CONFIG_LOCATION) 
+               sys.exit(1)
+        
     if nmconfig.remote:
         try:
             if not os.path.isdir(nmconfig.cache):

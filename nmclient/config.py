@@ -2,8 +2,7 @@ from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 import getpass
 import os
 
-CONFIG_LOCATIONS = ("notmuch-client.config",
-                    os.path.expanduser("~/.notmuch-client.config"))
+CONFIG_LOCATION = os.path.expanduser("~/.notmuch-client.config")
 
 TOPLEVEL_CONFIG_SECTION = "general"
 

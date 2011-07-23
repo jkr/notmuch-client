@@ -1,6 +1,6 @@
 from nmclient.command import NotmuchCommand, NotmuchCommandError
 from nmclient.config import NotmuchClientConfig, NotmuchClientConfigError, \
-    CONFIG_LOCATIONS
+    CONFIG_LOCATION
 
 
 __LICENSE__="GPL v3+"
