@@ -20,9 +20,9 @@ class NotmuchClientConfig(object):
     def account(self):
         if not hasattr(self, "_account"):
             if self._config_parser.has_option(TOPLEVEL_CONFIG_SECTION, 
-                                              "notmuch"):
+                                              "account"):
                 self._account = self._config_parser.get(TOPLEVEL_CONFIG_SECTION,
-                                                        "notmuch")
+                                                        "account")
             else:
                 self._account = None
         return self._account
