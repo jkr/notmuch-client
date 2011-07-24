@@ -47,7 +47,7 @@ The current configuration options are supported:
 
   * `general` settings
 
-      + `notmuch`: which account (set below) to use. If none set, this
+      + `account`: which account (set below) to use. If none set, this
         will default to local usage with default `notmuch` binary and
         configuration file.
 
