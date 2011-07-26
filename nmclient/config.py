@@ -31,59 +31,50 @@ class NotmuchClientConfig(object):
     def remote(self):
         if not hasattr(self, "_remote"):
             if self.account and self._config_parser.has_option(self.account, 
-                                                               "remote"):
-                self._remote = self._config_parser.getboolean(self.account, 
-                                                              "remote")
+                                                               "server"):
+                self._server = self._config_parser.get(self.account, 
+                                                       "server")
+                self._remote = True
                 # If we're remote, we'll also get all the other
                 # attributes we'll want if we're remote.
-                if self._remote:
-                    # The server is the only one that's required,
-                    # because there's no good way to set a default
-                    # value. The others will all default.
-                    try:
-                        self._server = self._config_parser.get(self.account, 
-                                                               "server")
-                    except NoOptionError:
-                        raise NotmuchClientConfigError, \
-                            "Account %s is set as remote, but it has no server set" % self.account
-                    
-                    # We'll get the ssh binary path as well. NOTE: This is
-                    # in the toplevel, since it's not really a
-                    # per-account setting.
-                    try:
-                        self._ssh_bin = self._config_parser.get (
-                            TOPLEVEL_CONFIG_SECTION, "ssh_bin"
-                            )
-                    except NoOptionError:
-                        self._ssh_bin = "ssh"
+                #
+                # We'll get the ssh binary path as well. NOTE: This is
+                # in the toplevel, since it's not really a
+                # per-account setting.
+                try:
+                    self._ssh_bin = self._config_parser.get (
+                        TOPLEVEL_CONFIG_SECTION, "ssh_bin"
+                        )
+                except NoOptionError:
+                    self._ssh_bin = "ssh"
 
-                    # User. This will default to the current logged in user.
-                    try:
-                        self._user = self._config_parser.get(self.account, 
-                                                             "user")
-                    except NoOptionError:
-                        self._user = getpass.getuser()
+                # User. This will default to the current logged in user.
+                try:
+                    self._user = self._config_parser.get(self.account, 
+                                                         "user")
+                except NoOptionError:
+                    self._user = getpass.getuser()
 
-                    # Private key. This will default to None, in which
-                    # case it just won't be used, and we'll let
-                    # openssh figure it out.
-                    try:
-                        self._private_key = self._config_parser.get (
-                            self.account, "public_key"
-                            )
-                    except NoOptionError:
-                        self._private_key = None
+                # Private key. This will default to None, in which
+                # case it just won't be used, and we'll let
+                # openssh figure it out.
+                try:
+                    self._private_key = self._config_parser.get (
+                        self.account, "public_key"
+                        )
+                except NoOptionError:
+                    self._private_key = None
 
-                    # And the cache. This will default to
-                    # "${HOME}/.notmuch-client-cache.d"
-                    try:
-                        self._cache = os.path.expanduser (
-                            self._config_parser.get(self.account, "cache")
-                            )
-                    except NoOptionError:
-                        self._cache = os.path.expanduser (
-                            "~/.notmuch-client-cache.d"
-                            )
+                # And the cache. This will default to
+                # "${HOME}/.notmuch-client-cache.d"
+                try:
+                    self._cache = os.path.expanduser (
+                        self._config_parser.get(self.account, "cache")
+                        )
+                except NoOptionError:
+                    self._cache = os.path.expanduser (
+                        "~/.notmuch-client-cache.d"
+                        )
 
             else:
                 self._remote = False
