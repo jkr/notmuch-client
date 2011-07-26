@@ -56,10 +56,8 @@ The current configuration options are supported:
   * `${account}`settings. (Note: you can have numerous accounts, and
     the one used will be determined by the `notmuch` setting in `general`.
 
-      + `remote`: yes/[no]
-
-      + `server`: server to user if `remote` is yes. (Setting remote
-        to "yes" and not setting a server will be an error.)
+      + `server`: ssh server for remote usage. If this is not set,
+      `notmuch-client` will assume local usage.
 
       + `user`: user for server. Defaults to current logged-in user.
 
