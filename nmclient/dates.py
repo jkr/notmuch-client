@@ -1,6 +1,33 @@
 import time
 from datetime import datetime, date, timedelta
 
+def _dayname_to_datetime (dayname):
+    dayname_lower = dayname.lower()
+    today = date.today()
+    today_day_num = today.weekday()
+
+    relative_dict = {"today": 0, "yesterday":1}
+    day_dict = dict(zip(["monday", "tuesday", "wednesday", 
+                    "thursday", "friday", "saturday", 
+                    "sunday"],
+                    range(7)))
+    day_abbrev_dict = dict(zip(["mon", "tue", "wed", 
+                            "thu", "fri", "sat", 
+                            "sun"],
+                           range(7)))
+
+    if dayname_lower in relative_dict:
+        return today - timedelta(relative_dict[dayname_lower])
+    elif dayname_lower in day_dict:
+        return today - timedelta((today_day_num - 
+                                  day_dict[dayname_lower]) % 7)
+    elif dayname_lower in day_abbrev_dict:
+        return today - timedelta((today_day_num - 
+                                  day_abbrev_dictdict[dayname_lower]) % 7)
+    else:
+        raise NotmuchDateRangeError, \
+            "Unknow date keyword: %s" % dayname
+
 def _timestring_to_datetime (date_string, default_datetime = None):
     """
     Takes a timestring of the form:
@@ -10,31 +37,34 @@ def _timestring_to_datetime (date_string, default_datetime = None):
     and converts it a datetime. The.
     """
     if not default_datetime:
-        default_datetime = datetime.now()
+        default_datetime = date.today()
     try:
-        split_date = [int(elem) for elem in date_string.split('-')]
-    except ValueError:
-        raise NotmuchDateRangeError, \
-            "Illegal date format: %s" % date_string
+        out = _dayname_to_datetime(date_string)
+    except NotmuchDateRangeError:
+        try:
+            split_date = [int(elem) for elem in date_string.split('-')]
+        except ValueError:
+            raise NotmuchDateRangeError, \
+                "Illegal date format: %s" % date_string
+        
+        # Now, we go through the date, and fill in missing parts with our
+        # default
 
-    # Now, we go through the date, and fill in missing parts with our
-    # default
+        if len(split_date) == 1:
+            modified_date = (default_datetime.year,
+                             default_datetime.month,
+                             split_date[0])
+        elif len(split_date) == 2:
+            modified_date = (default_datetime.year,
+                             split_date[0],
+                             split_date[1])
+        elif len(split_date) == 3:
+            modified_date = split_date
+        else:
+            raise NotmuchDateRangeError, \
+                "Illegal date format: %s" % split_date
 
-    if len(split_date) == 1:
-        modified_date = (default_datetime.year,
-                         default_datetime.month,
-                         split_date[0])
-    elif len(split_date) == 2:
-        modified_date = (default_datetime.year,
-                         split_date[0],
-                         split_date[1])
-    elif len(split_date) == 3:
-        modified_date = split_date
-    else:
-        raise NotmuchDateRangeError, \
-            "Illegal date format: %s" % split_date
-
-    out = datetime(*modified_date)
+        out = datetime(*modified_date)
     return out
 
 class NotmuchDateRangeError (Exception):
@@ -58,7 +88,7 @@ class DateRange (object):
                 end = _timestring_to_datetime(split_range[0])
             elif not split_range[1]:
                 start = _timestring_to_datetime(split_range[0])
-                end = datetime.now()
+                end = date.today()
             else:
                 start = _timestring_to_datetime(split_range[0])
                 end = _timestring_to_datetime(split_range[1])
