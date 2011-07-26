@@ -15,7 +15,7 @@ def _timestring_to_datetime (date_string, default_datetime = None):
         split_date = [int(elem) for elem in date_string.split('-')]
     except ValueError:
         raise NotmuchDateRangeError, \
-            "Illegal date format: %s" % split_date
+            "Illegal date format: %s" % date_string
 
     # Now, we go through the date, and fill in missing parts with our
     # default
@@ -50,15 +50,18 @@ class DateRange (object):
     def from_string_range(cls, range_string):
         split_range = range_string.split("--")
         if len(split_range) == 1:
-            if range_string[:2] == "--":
+            start = _timestring_to_datetime(split_range[0])
+            end = start
+        elif len(split_range) == 2:
+            if not split_range[0]:
                 start = datetime.fromtimestamp(0)
                 end = _timestring_to_datetime(split_range[0])
-            elif range_string[-2:] == "--":
+            elif not split_range[1]:
                 start = _timestring_to_datetime(split_range[0])
-                end = date.now()
-        elif len(split_range) == 2:
-            start = _timestring_to_datetime(split_range[0])
-            end = _timestring_to_datetime(split_range[1])
+                end = datetime.now()
+            else:
+                start = _timestring_to_datetime(split_range[0])
+                end = _timestring_to_datetime(split_range[1])
         else:
             raise NotmuchDateRangeError, \
                 "Not a valid range string: %s" % range_string
