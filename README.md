@@ -1,7 +1,7 @@
 notmuch-client
 ==============
 
-A client wrapper for notmuch. 
+A client wrapper for the [notmuch mail system](http://notmuchmail.org). 
 
 The aims of notmuch-client
 --------------------------
