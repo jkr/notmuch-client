@@ -1,5 +1,6 @@
 from nmclient.shared import _run_command_locally, _run_command_over_ssh
 from nmclient.dates import DateRange
+from nmclient.filters import SearchTermStack, alias_filter, date_filter
 from hashlib import sha1
 from email import message_from_file
 from itertools import islice
@@ -42,11 +43,14 @@ class NotmuchCommand (object):
 
         return dict(modified_params)
 
-    def get_search_terms (self):
-        i = 1
+    def get_search_term_index (self):
+        i = 0
         while self.args[i][:2] == "--":
             i += 1
-        return self.args[i:]
+        return i
+
+    def get_search_terms (self):
+        return self.args[self.get_search_term_index():]
 
     def run (self):
         if self.config.remote:
@@ -61,25 +65,22 @@ class NotmuchGeneric (NotmuchCommand):
         self.command = command
 
 class NotmuchSearch (NotmuchCommand):
+
+    filter_list = [alias_filter, date_filter]
     
     def __init__(self, nmconfig, args):
         super(NotmuchSearch, self).__init__(nmconfig, args)
         self.command = "search"
-        self._modify_date_args()
+        self._filter_search_terms()
 
-    def _modify_date_args(self):
-        new_arg_list = []
-        for arg in self.args:
-            # We have to split the args up further, since the emacs
-            # client will quote them together.
-            for subarg in arg.split():
-                if subarg[:5] != "date:":
-                    new_arg_list.append(subarg)
-                else:
-                    date_range = DateRange.from_string_range(subarg[5:])
-                    new_arg_list.append(date_range.as_timestamp_range())
-        self.args = new_arg_list
-
+    def _filter_search_terms(self):
+        idx = self.get_search_term_index()
+        search_terms = self.args[idx:]
+        stack = SearchTermStack(search_terms, self.config)
+        stack.filters = self.filter_list
+        modified_search_terms = list(stack)
+        modified_args = self.args[:idx] + modified_search_terms
+        self.args = modified_args
 
 class NotmuchShow (NotmuchCommand):
 
