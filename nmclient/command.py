@@ -116,8 +116,8 @@ class NotmuchShow (NotmuchCommand):
         cached_file_name = os.path.join(self.config.cache, hashed_terms)
 
         if not os.path.isfile(cached_file_name):
-            raw_file_output = \
-                _run_command_over_ssh(self.config, "show", ["--format=raw"] + search_terms)
+            raw_file_output = _run_command_over_ssh(self.config, "show", 
+                                                    ["--format=raw"] + search_terms)
             if raw_file_output[1]:
                 raise NotmuchCommandError, \
                     "Output on stderr"
@@ -139,7 +139,8 @@ class NotmuchShow (NotmuchCommand):
                 "Should only be fetching a local file when show format is \"raw\""
 
         search_terms = self.get_search_terms()
-        filename_output = _run_command_locally(self.config, "search", ["--output=files"] + search_terms)
+        filename_output = _run_command_locally(self.config, "search", 
+                                               ["--output=files"] + search_terms)
         return filename_output[0].strip().split('\n')[0]
 
     def get_mail_file(self):
