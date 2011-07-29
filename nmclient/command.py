@@ -12,6 +12,8 @@ class NotmuchCommandError(Exception):
 
 class NotmuchCommand (object):
 
+    filter_list = [alias_filter, date_filter]
+
     def __init__(self, nmconfig, args):
         self.args = args
         self.config = nmconfig
@@ -23,11 +25,9 @@ class NotmuchCommand (object):
         
         cmd = args[0]
         arglist = args[1:]
-        if cmd in ("new", "count", "tag", 
+        if cmd in ("new", "count", "tag", "search",
                    "reply", "help", "config"):
             return NotmuchGeneric(nmconfig, cmd, arglist)
-        elif cmd == "search":
-            return NotmuchSearch(nmconfig, arglist)
         elif cmd == "show":
             return NotmuchShow(nmconfig, arglist)
         else:
@@ -44,43 +44,41 @@ class NotmuchCommand (object):
         return dict(modified_params)
 
     def get_search_term_index (self):
-        i = 0
-        while self.args[i][:2] == "--":
-            i += 1
-        return i
+        if self.args:
+            i = 0
+            while self.args[i][:2] == "--":
+                i += 1
+            return i
+        else:
+            return 0
 
     def get_search_terms (self):
         return self.args[self.get_search_term_index():]
 
-    def run (self):
-        if self.config.remote:
-            return _run_command_over_ssh (self.config, self.command, self.args)
-        else:
-            return _run_command_locally (self.config, self.command, self.args)
-
-class NotmuchGeneric (NotmuchCommand):
-    
-    def __init__(self, nmconfig, command, args):
-        super(NotmuchGeneric, self).__init__(nmconfig, args)
-        self.command = command
-
-class NotmuchSearch (NotmuchCommand):
-
-    filter_list = [alias_filter, date_filter]
-    
-    def __init__(self, nmconfig, args):
-        super(NotmuchSearch, self).__init__(nmconfig, args)
-        self.command = "search"
-        self._filter_search_terms()
-
-    def _filter_search_terms(self):
+    def filter_args(self):
         idx = self.get_search_term_index()
         search_terms = self.args[idx:]
         stack = SearchTermStack(search_terms, self.config)
         stack.filters = self.filter_list
         modified_search_terms = list(stack)
         modified_args = self.args[:idx] + modified_search_terms
-        self.args = modified_args
+        return modified_args
+
+    def run (self):
+        if self.config.remote:
+            return _run_command_over_ssh (self.config, 
+                                          self.command, 
+                                          self.filter_args())
+        else:
+            return _run_command_locally (self.config, 
+                                         self.command, 
+                                         self.filter_args())
+
+class NotmuchGeneric (NotmuchCommand):
+    
+    def __init__(self, nmconfig, command, args):
+        super(NotmuchGeneric, self).__init__(nmconfig, args)
+        self.command = command
 
 class NotmuchShow (NotmuchCommand):
 
@@ -187,8 +185,12 @@ class NotmuchShow (NotmuchCommand):
         elif self.format == "raw":
             return (self._run_raw(), '')
         elif self.config.remote:
-            return _run_command_over_ssh(self.config, self.command, self.args)
+            return _run_command_over_ssh(self.config, 
+                                         self.command, 
+                                         self.filter_args())
         else:
-            return _run_command_locally(self.config, self.command, self.args)
+            return _run_command_locally(self.config, 
+                                        self.command, 
+                                        self.filter_args())
 
 
