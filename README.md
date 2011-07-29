@@ -93,7 +93,7 @@ A future version will add distutils setup.
 Current Enhancements
 --------------------
 
-  * search:
+  * search terms:
 
       + You can search for **date ranges** using the search prefix
         `date:` and the syntax:
