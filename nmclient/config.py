@@ -1,4 +1,5 @@
 from ConfigParser import ConfigParser, NoOptionError, NoSectionError
+from nmclient.shared import resolve_recurs, AliasRecursionError
 import getpass
 import os
 
@@ -143,9 +144,12 @@ class NotmuchClientConfig(object):
     def aliases(self):
         if not hasattr(self, "_aliases"):
             try:
-                self._aliases = dict(self._config_parser.items("aliases"))
+                alias_dict = dict(self._config_parser.items("aliases"))
+                self._aliases = resolve_recurs(alias_dict)
             except NoSectionError:
                 self._aliases = None
+            except AliasRecursionError as err:
+                raise NotmuchClientConfigError, err
         return self._aliases
                 
 
