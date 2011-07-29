@@ -16,6 +16,7 @@ class NotmuchClientConfig(object):
         if configfile:
             self._config_parser.read(configfile)
 
+
     @property
     def account(self):
         if not hasattr(self, "_account"):
@@ -130,10 +131,21 @@ class NotmuchClientConfig(object):
     @property
     def notmuch_config(self):
         if not hasattr(self, "_notmuch_config"):
-            if self.account and self._config_parser.has_option (self.account, 
-                                                                "notmuch_config"):
+            if self.account and self._config_parser.has_option(self.account, 
+                                                               "notmuch_config"):
                 self._notmuch_bin = self._config_parser.get(self.account, 
                                                             "notmuch_config")
             else:
                 self._notmuch_bin = None
         return self._notmuch
+
+    @property
+    def aliases(self):
+        if not hasattr(self, "_aliases"):
+            try:
+                self._aliases = dict(self._config_parser.items("aliases"))
+            except NoSectionError:
+                self._aliases = None
+        return self._aliases
+                
+
