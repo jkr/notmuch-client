@@ -43,7 +43,7 @@ class SearchTermStack(object):
         tok_list = tok.split()
         out = tok_list.pop(0)
         self.stack = tok_list + self.stack
-        return out
+        return "\"%s\"" % out
 
     def push(self, string):
         self.stack.insert(0, string)
