@@ -140,7 +140,7 @@ Current Enhancements
             
             me = from:myname or to:myname
             vacation_week = date:2011-3-18--3-25
-            job = from:*@workname.com
+            job = from:workname.com
             missed_work = alias:vacation_week and alias:job
 
         Note that the final entry is recursive. There is a check in
