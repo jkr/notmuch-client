@@ -1,4 +1,3 @@
-from nmclient.config import NotmuchClientConfig
 from nmclient.dates import DateRange
 
 def date_filter(token, stack, config):
@@ -25,15 +24,10 @@ def alias_filter(token, stack, config):
 
 class SearchTermStack(object):
 
-    def __init__(self, term_lst, nmconfig = None):
+    def __init__(self, term_lst, nmconfig):
         self.stack = term_lst
-
-        if not nmconfig:
-            self.config = NotmuchClientConfig()
-        else:
-            self.config = nmconfig
-
         self.filters = []
+        self.config = nmconfig
 
     def __repr__(self):
         return "Stack%r" % self.stack
