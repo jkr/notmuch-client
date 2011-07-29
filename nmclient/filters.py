@@ -43,7 +43,7 @@ class SearchTermStack(object):
         tok_list = tok.split()
         out = tok_list.pop(0)
         self.stack = tok_list + self.stack
-        return "\"%s\"" % out
+        return out
 
     def push(self, string):
         self.stack.insert(0, string)
@@ -62,7 +62,7 @@ class SearchTermStack(object):
                     i += 1
             except IndexError:
                 try:
-                    return self.pop()
+                    return "\"%s\"" % self.pop()
                 except IndexError:
                     raise StopIteration
             
