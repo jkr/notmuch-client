@@ -122,9 +122,33 @@ Current Enhancements
 
         will mean the range between 2009-3-11 and 2009-4-25.
 
-           date 2009-3-11--
+           date:2009-3-11--
 
         will mean the range between 2009-3-11 and today.
+
+      + You can use **named aliases** in your configuration file. This
+        is already available through the emacs interface, but this
+        allows, among other things, for recursive aliases, and for the
+        aliases to be integrated into searches. You will use the
+        "alias:" search prefix for this.
+
+        Aliases go in a section in your config file entitled
+        "aliases". So, you put something like the following in your
+        `.notmuch-client.config`:
+
+            [aliases]
+            
+            me = from:myname or to:myname
+            vacation_week = date:2011-3-18--3-25
+            job = from:*@workname.com
+            missed_work = alias:vacation_week and alias:job
+
+        Note that the final entry is recursive. There is a check in
+        place for infinite recursion, and notmuch-client should refuse
+        to start if it can't resolve your aliases.
+            
+
+        
 
 
 
