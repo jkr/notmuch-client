@@ -1,3 +1,4 @@
+from subprocess import Popen, PIPE
 from nmclient.shared import _run_command_locally, _run_command_over_ssh
 from nmclient.dates import DateRange
 from nmclient.filters import SearchTermStack, alias_filter, date_filter
@@ -182,9 +183,12 @@ class NotmuchShow (NotmuchCommand):
 
     def run (self):
         if self.partnum:
-            return (self._run_part(), '')
+            # Using a trivial subprocess for the sake of consistency.
+            return Popen(["echo", "-n", self._run_part()], 
+                         stdin = PIPE, stdout = PIPE, stderr = PIPE)
         elif self.format == "raw":
-            return (self._run_raw(), '')
+            return Popen(["echo", "-n", self._run_raw()], 
+                         stdin = PIPE, stdout = PIPE, stderr = PIPE)
         elif self.config.remote:
             return _run_command_over_ssh(self.config, 
                                          self.command, 

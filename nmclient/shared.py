@@ -5,7 +5,7 @@ def _run_command_locally (nmconfig, command, args):
     command_list = connection_commands + [command] + args
     command = Popen(command_list, 
                     stdin = PIPE, stdout = PIPE, stderr = PIPE)
-    return command.communicate()
+    return command
 
 def _run_command_over_ssh (nmconfig, command, args):
     connection_commands = [nmconfig.ssh_bin, 
@@ -14,7 +14,8 @@ def _run_command_over_ssh (nmconfig, command, args):
     command_list = connection_commands + [command] + args
     command = Popen(command_list, 
                     stdin = PIPE, stdout = PIPE, stderr = PIPE)
-    return command.communicate()
+    return command
+
 
 class AliasRecursionError(Exception):
     pass
