@@ -22,7 +22,8 @@
 
 from nmclient.dates import DateRange
 
-def date_filter(token, stack, config):
+def date_filter(stack, config):
+    token = stack.pop()
     if token[:5] == "date:":
         d = DateRange.from_string_range(token[5:])
         stack.push(d.as_timestamp_range())
@@ -31,7 +32,8 @@ def date_filter(token, stack, config):
     stack.push(token)
     return False
 
-def alias_filter(token, stack, config):
+def alias_filter(stack, config):
+    token = stack.pop()
     if token[:6] == "alias:":
         try:
             value = config.aliases[token[6:]]
@@ -78,7 +80,7 @@ class SearchTermStack(object):
         while True:
             try:
                 fltr = self.filters[i]
-                if fltr(self.pop(), self, self.config):
+                if fltr(self, self.config):
                     i = 0
                 else:
                     i += 1
