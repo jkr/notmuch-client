@@ -23,29 +23,31 @@
 import time
 from datetime import datetime, date, timedelta
 
+relative_day_dict = {"monday": 0,
+                     "tuesday": 1,
+                     "wednesday": 2,
+                     "thursday": 3,
+                     "friday": 4,
+                     "saturday": 5,
+                     "sunday": 6,
+                     "mon": 0,
+                     "tue": 1,
+                     "wed": 2,
+                     "thu": 3,
+                     "fri": 4,
+                     "sat": 5,
+                     "sun": 6}
+
 def _dayname_to_datetime (dayname):
     dayname_lower = dayname.lower()
     today = date.today()
     today_day_num = today.weekday()
 
-    relative_dict = {"today": 0, "yesterday":1}
-    day_dict = dict(zip(["monday", "tuesday", "wednesday", 
-                    "thursday", "friday", "saturday", 
-                    "sunday"],
-                    range(7)))
-    day_abbrev_dict = dict(zip(["mon", "tue", "wed", 
-                            "thu", "fri", "sat", 
-                            "sun"],
-                           range(7)))
-
-    if dayname_lower in relative_dict:
-        return today - timedelta(relative_dict[dayname_lower])
-    elif dayname_lower in day_dict:
+    if dayname_lower in ("today", "yesterday"):
+        return today - timedelta(("today", "yesterday").index(dayname_lower))
+    elif dayname_lower in relative_day_dict:
         return today - timedelta((today_day_num - 
                                   day_dict[dayname_lower]) % 7)
-    elif dayname_lower in day_abbrev_dict:
-        return today - timedelta((today_day_num - 
-                                  day_abbrev_dictdict[dayname_lower]) % 7)
     else:
         raise NotmuchDateRangeError, \
             "Unknow date keyword: %s" % dayname
