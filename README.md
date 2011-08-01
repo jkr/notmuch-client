@@ -134,6 +134,11 @@ Current Enhancements
 
         will mean the range between 2009-3-11 and today.
 
+        You can also use `today`, `yesterday`, or the names of
+        weekdays. At the moment weekdays will be the last day with
+        that name. (If today is Wednesday, `date:tuesday` will be
+        yesterday, and `date:thursday` will be last week.)
+
       + You can use **named aliases** in your configuration file. This
         is already available through the emacs interface, but this
         allows, among other things, for recursive aliases, and for the
