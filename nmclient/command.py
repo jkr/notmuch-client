@@ -300,11 +300,5 @@ class NotmuchShow (NotmuchCommand):
         elif self.format == "raw":
             return Popen(["echo", "-n", self._run_raw()], 
                          stdin = PIPE, stdout = PIPE, stderr = PIPE)
-        elif self.config.remote:
-            return _run_command_over_ssh(self.config, 
-                                         self.command, 
-                                         self.filter_args())
         else:
-            return _run_command_locally(self.config, 
-                                        self.command, 
-                                        self.filter_args())
+            return self._run_command(self.command, self.filter_args())
