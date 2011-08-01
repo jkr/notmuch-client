@@ -55,9 +55,11 @@ class NotmuchCommand (object):
         
         cmd = args[0]
         arglist = args[1:]
-        if cmd in ("new", "count", "tag", "search-tags",
+        if cmd in ("count", "tag", "search-tags",
                    "search", "reply", "help", "config"):
             return NotmuchGeneric(nmconfig, cmd, arglist)
+        elif cmd == "new":
+            return NotmuchNew(nmconfig, arglist)
         elif cmd == "show":
             return NotmuchShow(nmconfig, arglist)
         else:
@@ -112,6 +114,13 @@ class NotmuchGeneric (NotmuchCommand):
     def __init__(self, nmconfig, command, args):
         super(NotmuchGeneric, self).__init__(nmconfig, args)
         self.command = command
+
+class NotmuchNew (NotmuchCommand):
+    
+    def __init__(self, nmconfig, args):
+        super(NotmuchNew, self).__init__(nmconfig, args)
+        self.command = "new"
+
 
 class NotmuchShow (NotmuchCommand):
 
