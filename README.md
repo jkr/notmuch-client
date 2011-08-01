@@ -86,6 +86,10 @@ The current configuration options are supported:
         caches if you have more than one remote account. This will be
         enforced in the future.
 
+  * `alias` settings:
+
+      + See the alias section below.
+
 Usage
 -----
 
