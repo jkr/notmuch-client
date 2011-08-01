@@ -283,10 +283,11 @@ class NotmuchShow (NotmuchCommand):
     def run (self):
 
         if self.decrypt and self.format == "json":
+            # Using a trivial subprocess for the sake of
+            # consistency. There must be a better way to do this.
             return Popen(["echo", "-n", self._run_crypto_json(decrypt=True)],
                          stdin = PIPE, stdout=PIPE, stderr=PIPE)
         elif self.verify and self.format == "json":
-            # Using a trivial subprocess for the sake of consistency.
             return Popen(["echo", "-n", self._run_crypto_json(decrypt=False)],
                          stdin = PIPE, stdout=PIPE, stderr=PIPE)
         elif self.partnum:
