@@ -76,6 +76,11 @@ class SearchTermStack(object):
         return self
 
     def next(self):
+        # The idea here is that we only want to be done with the stack
+        # when all of the filter functions return False (that is, do
+        # nothing). Until that time, if a function does something (and
+        # returns True), we start going through all the functions
+        # again.
         i = 0
         while True:
             try:
