@@ -49,8 +49,8 @@ class NotmuchCommand (object):
         
         cmd = args[0]
         arglist = args[1:]
-        if cmd in ("new", "count", "tag", "search",
-                   "reply", "help", "config"):
+        if cmd in ("new", "count", "tag", "search-tags",
+                   "search", "reply", "help", "config"):
             return NotmuchGeneric(nmconfig, cmd, arglist)
         elif cmd == "show":
             return NotmuchShow(nmconfig, arglist)
