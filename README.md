@@ -29,8 +29,7 @@ The aims of notmuch-client
     order to avoid having a key on numerous computers, and to remove
     the need for any X-tunneled pinentry programs.
 
-    Verification is most of the way to being implemented. It works
-    from the command line, but not from emacs for some reason.
+    Verification is most of the way to being implemented. 
 
     Decryption hasn't yet been implemented. This is not too
     technically hard, but it does require replicating notmuch's
