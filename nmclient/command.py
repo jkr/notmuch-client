@@ -139,11 +139,16 @@ class NotmuchShow (NotmuchCommand):
         else:
             self.partnum = None
 
-        
         if "verify" in params:
             self.verify = True
         else:
             self.verify = False
+
+        if "decrypt" in params:
+            self.decrypt = True
+        else:
+            self.decrypt = False
+
 
     def _get_cached_file(self):
         if not self.format == "raw":
@@ -235,13 +240,21 @@ class NotmuchShow (NotmuchCommand):
             status_value = "good" if verification.valid else "bad"
             msg_dict['body'][0]['sigstatus'] = [{'keyid': verification.key_id,
                                                  'status': status_value}]
+
+    def __decrypt_single_message(self, msg_dict):
+        """Not implemented"""
+        pass
         
-    def _run_verify_internal (self):
+    def _run_crypto_internal (self, decrypt=True):
         # First, we get the json
         search_terms = self.get_search_terms()
         params = self.get_params()
         params["format"] = "json"
-        params.__delitem__("verify")
+        try:
+            params.__delitem__("verify")
+            params.__delitem__("decrypt")
+        except KeyError:
+            pass
         param_list = []
         for (k,v) in params.items():
             if v is True:
@@ -259,16 +272,22 @@ class NotmuchShow (NotmuchCommand):
         except JSONDecodeError:
             raise NotmuchCommandError, "Received ill-formed JSON"
 
-        modified = alter_json_objects(parsed, self.__verify_single_message)
+        modified = alter_json_objects(parsed, 
+                                      [self.__verify_single_message,
+                                       self.__decrypt_single_message])
         return modified
 
-    def _run_verify_json(self):
-        return json.dumps(self._run_verify_internal())
+    def _run_crypto_json(self, decrypt=True):
+        return json.dumps(self._run_crypto_internal(decrypt))
 
     def run (self):
-        if self.verify and self.format == "json":
+
+        if self.decrypt and self.format == "json":
+            return Popen(["echo", "-n", self._run_crypto_json(decrypt=True)],
+                         stdin = PIPE, stdout=PIPE, stderr=PIPE)
+        elif self.verify and self.format == "json":
             # Using a trivial subprocess for the sake of consistency.
-            return Popen(["echo", "-n", self._run_verify_json()],
+            return Popen(["echo", "-n", self._run_crypto_json(decrypt=False)],
                          stdin = PIPE, stdout=PIPE, stderr=PIPE)
         elif self.partnum:
             return Popen(["echo", "-n", self._run_part()], 

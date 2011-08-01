@@ -61,15 +61,16 @@ def resolve_recurs(dct):
     return dct
 
         
-def alter_json_objects(json_structure, fn):
+def alter_json_objects(json_structure, fn_lst):
     """This walks the json structure and applies a destructive
     function fn to the objects (dicts)."""
     if isinstance(json_structure, dict):
-        fn(json_structure)
+        for fn in fn_lst:
+            fn(json_structure)
         return json_structure
     else:
         out = []
         for elem in json_structure:
-            out.append(alter_json_objects(elem, fn))
+            out.append(alter_json_objects(elem, fn_lst))
         return out
 
