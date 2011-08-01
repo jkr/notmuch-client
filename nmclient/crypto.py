@@ -1,4 +1,4 @@
-# -*- python;  coding: utf-8  -*-
+# -*-  coding: utf-8  -*-
 #########################################################################
 # crypto.py: functions for use with encryption and verification         #
 #                                                                       #

@@ -1,4 +1,4 @@
-# -*- python;  coding: utf-8  -*-
+# -*-  coding: utf-8  -*-
 #########################################################################
 # filters.py: interface for filtering search terms in notmuch-client    #
 #                                                                       #

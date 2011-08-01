@@ -1,4 +1,4 @@
-# -*- python;  coding: utf-8  -*-
+# -*-  coding: utf-8  -*-
 #########################################################################
 # shared.py: functions shared by classes in other modules.              #
 #                                                                       #

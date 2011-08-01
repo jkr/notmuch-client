@@ -1,4 +1,4 @@
-# -*- python;  coding: utf-8  -*-
+# -*-  coding: utf-8  -*-
 #########################################################################
 # command.py: classes for intercepting and possibly altering notmuch    #
 # commands                                                              #

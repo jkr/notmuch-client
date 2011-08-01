@@ -1,4 +1,4 @@
-# -*- python;  coding: utf-8  -*-
+# -*-  coding: utf-8  -*-
 #########################################################################
 # config.py: class for use with configuration of notmuch-client         #
 #                                                                       #

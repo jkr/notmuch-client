@@ -1,4 +1,4 @@
-# -*- python;  coding: utf-8  -*-
+# -*-  coding: utf-8  -*-
 #########################################################################
 # dates.py: for use with date-range substitution in notmuch-client      #
 #                                                                       #
@@ -128,15 +128,3 @@ class DateRange (object):
 
     def as_timestamp_range(self):
         return "%d..%d" % (self.start, self.end)
-
-        
-
-            
-
-        
-
-        
-        
-
-        
-    
