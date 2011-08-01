@@ -272,9 +272,13 @@ class NotmuchShow (NotmuchCommand):
         except JSONDecodeError:
             raise NotmuchCommandError, "Received ill-formed JSON"
 
-        modified = alter_json_objects(parsed, 
-                                      [self.__verify_single_message,
-                                       self.__decrypt_single_message])
+        if decrypt:
+            modified = alter_json_objects(parsed, 
+                                          [self.__verify_single_message,
+                                           self.__decrypt_single_message])
+        else:
+            modified = alter_json_objects(parsed, 
+                                          [self.__verify_single_message])
         return modified
 
     def _run_crypto_json(self, decrypt=True):
