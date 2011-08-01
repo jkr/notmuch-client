@@ -46,7 +46,7 @@ def verify(multipart_signed_msg):
     verification = gpg.verify_file(sig_fp, data_file)
     os.remove(data_file)
 
-    return verification.valid
+    return verification
 
 def decrypt(multipart_encrypted_msg):
     parts = multipart_encrypted_msg.get_payload()
@@ -56,6 +56,8 @@ def decrypt(multipart_encrypted_msg):
     decryption = gpg.decrypt(encrypted_part)
 
     return (decryption.valid, decryption.data)
+
+
 
 
     

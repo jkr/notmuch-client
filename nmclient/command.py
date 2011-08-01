@@ -22,14 +22,20 @@
 #########################################################################
 
 from subprocess import Popen, PIPE
-from nmclient.shared import _run_command_locally, _run_command_over_ssh
+from nmclient.shared import _run_command_locally, _run_command_over_ssh, alter_json_objects
 from nmclient.dates import DateRange
 from nmclient.filters import SearchTermStack, alias_filter, date_filter
+from nmclient.crypto import verify
 from hashlib import sha1
-from email import message_from_file
+from email import message_from_file, message_from_string
 from itertools import islice
 import os
 import sys
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 
 class NotmuchCommandError(Exception):
     pass
@@ -88,15 +94,18 @@ class NotmuchCommand (object):
         modified_args = self.args[:idx] + modified_search_terms
         return modified_args
 
-    def run (self):
+    def _run_command(self, command, args):
         if self.config.remote:
             return _run_command_over_ssh (self.config, 
-                                          self.command, 
-                                          self.filter_args())
+                                          command, 
+                                          args)
         else:
             return _run_command_locally (self.config, 
-                                         self.command, 
-                                         self.filter_args())
+                                         command, 
+                                         args)
+
+    def run (self):
+        return self._run_command(self.command, self.filter_args())
 
 class NotmuchGeneric (NotmuchCommand):
     
@@ -130,6 +139,12 @@ class NotmuchShow (NotmuchCommand):
         else:
             self.partnum = None
 
+        
+        if "verify" in params:
+            self.verify = True
+        else:
+            self.verify = False
+
     def _get_cached_file(self):
         if not self.format == "raw":
             raise NotmuchCommandError, \
@@ -140,8 +155,10 @@ class NotmuchShow (NotmuchCommand):
         cached_file_name = os.path.join(self.config.cache, hashed_terms)
 
         if not os.path.isfile(cached_file_name):
-            raw_file_output = _run_command_over_ssh(self.config, "show", 
-                                                    ["--format=raw"] + search_terms)
+            raw_file_process = self._run_command("show", 
+                                                 ["--format=raw"] + search_terms)
+                                                     
+            raw_file_output = raw_file_process.communicate()
             if raw_file_output[1]:
                 raise NotmuchCommandError, \
                     "Output on stderr"
@@ -163,8 +180,9 @@ class NotmuchShow (NotmuchCommand):
                 "Should only be fetching a local file when show format is \"raw\""
 
         search_terms = self.get_search_terms()
-        filename_output = _run_command_locally(self.config, "search", 
-                                               ["--output=files"] + search_terms)
+        filename_process = self._run_command("search", 
+                                             ["--output=files"] + search_terms)
+        filename_out = filename_process.communicate()
         return filename_output[0].strip().split('\n')[0]
 
     def get_mail_file(self):
@@ -204,9 +222,55 @@ class NotmuchShow (NotmuchCommand):
         else:
             return part.get_payload(decode=True)
 
+
+    def __verify_single_message(self, msg_dict):
+        if msg_dict['body'][0]['content-type'] == "multipart/signed":
+            msg_id = msg_dict['id']
+
+            raw_show = NotmuchShow(self.config, 
+                                   ["--format=raw", "id:%s" % msg_id])
+            data = raw_show._run_raw()
+            msg = message_from_string(data)
+            verification = verify(msg)
+            status_value = "good" if verification.valid else "bad"
+            msg_dict['body'][0]['sigstatus'] = [{'keyid': verification.key_id,
+                                                 'status': status_value}]
+        
+    def _run_verify_internal (self):
+        # First, we get the json
+        search_terms = self.get_search_terms()
+        params = self.get_params()
+        params["format"] = "json"
+        params.__delitem__("verify")
+        param_list = []
+        for (k,v) in params.items():
+            if v is True:
+                param_list.append("--%s" % k)
+            elif v is False:
+                pass
+            else:
+                param_list.append("--%s=%s" % (k, v))
+
+        json_process = self._run_command("show", 
+                                         param_list + search_terms)
+        json_output = json_process.communicate()[0]
+        try:
+            parsed = json.loads(json_output)
+        except JSONDecodeError:
+            raise NotmuchCommandError, "Received ill-formed JSON"
+
+        modified = alter_json_objects(parsed, self.__verify_single_message)
+        return modified
+
+    def _run_verify_json(self):
+        return json.dumps(self._run_verify_internal())
+
     def run (self):
-        if self.partnum:
+        if self.verify and self.format == "json":
             # Using a trivial subprocess for the sake of consistency.
+            return Popen(["echo", "-n", self._run_verify_json()],
+                         stdin = PIPE, stdout=PIPE, stderr=PIPE)
+        elif self.partnum:
             return Popen(["echo", "-n", self._run_part()], 
                          stdin = PIPE, stdout = PIPE, stderr = PIPE)
         elif self.format == "raw":
@@ -220,5 +284,3 @@ class NotmuchShow (NotmuchCommand):
             return _run_command_locally(self.config, 
                                         self.command, 
                                         self.filter_args())
-
-

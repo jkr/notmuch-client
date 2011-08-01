@@ -60,3 +60,16 @@ def resolve_recurs(dct):
         dct[k] = ' '.join(_resolve_recurs_item(dct, k, v)) 
     return dct
 
+        
+def alter_json_objects(json_structure, fn):
+    """This walks the json structure and applies a destructive
+    function fn to the objects (dicts)."""
+    if isinstance(json_structure, dict):
+        fn(json_structure)
+        return json_structure
+    else:
+        out = []
+        for elem in json_structure:
+            out.append(alter_json_objects(elem, fn))
+        return out
+
