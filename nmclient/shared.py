@@ -30,6 +30,9 @@ def _run_command_general (program_commands, command, args):
 
 
 def _run_command_locally (nmconfig, command, args):
+    # This is another annoying workaround for argument-quoting.
+    if args and args[-1][0] == '"' and args[-1][-1] == '"':
+        args = args[:-1] + args[-1][1:-1].split()
     connection_commands = [nmconfig.notmuch_bin]
     return _run_command_general(connection_commands, command, args)
 
