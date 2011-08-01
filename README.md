@@ -18,19 +18,24 @@ The aims of notmuch-client
  2. To allow users to supplement certain commands without needing to
     wade into the notmuch sources. 
 
-    One example: notmuch-client adds more convenient date ranges to
-    searching through the use of the `date:` search-term. See "Current
+    At the moment, notmuch-client adds more convenient date ranges to
+    searching through the use of the `date:` search-term, and
+    recursive aliases through the `alias:` search term. See "Current
     Enhancements" section below.
 
 
- 3. ...and note, this is *not* implemented yet, but... To move
+ 3. ...and note, this is *not* fully implemented yet, but... To move
     decryption and verification to client side during remote usage in
     order to avoid having a key on numerous computers, and to remove
     the need for any X-tunneled pinentry programs.
 
-    (This part won't be *too* hard, but it will require replicating
-    notmuch's undocumented JSON format, which might be something of a
-    moving target.)
+    Verification is most of the way to being implemented. It works
+    from the command line, but not from emacs for some reason.
+
+    Decryption hasn't yet been implemented. This is not too
+    technically hard, but it does require replicating notmuch's
+    undocumented JSON format, which might be something of a moving
+    target.
 
 Installation and Configuration
 ------------------------------
