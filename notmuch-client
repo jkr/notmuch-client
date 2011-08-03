@@ -38,16 +38,20 @@ if __name__ == "__main__":
                sys.exit(1)
     else:
         nmconfig = NotmuchClientConfig()
-        
-    if nmconfig.remote:
-        try:
-            if not os.path.isdir(nmconfig.cache):
-                os.mkdir(nmconfig.cache)
-        except OSError:
-            sys.stdout.write("Can't make cache file at %s" % nmconfig.cache)
-    args = sys.argv[1:]
-    command = NotmuchCommand.make_command(nmconfig, args)
-    process = command.run()
+    
+    try:
+        if nmconfig.remote:
+            try:
+                if not os.path.isdir(nmconfig.cache):
+                    os.mkdir(nmconfig.cache)
+            except OSError:
+                sys.stdout.write("Can't make cache file at %s" % nmconfig.cache)
+        args = sys.argv[1:]
+        command = NotmuchCommand.make_command(nmconfig, args)
+        process = command.run()
+    except NotmuchClientConfigError as err:
+        sys.stderr.write("Problem reading config file:\n%s" % err)
+        sys.exit(1)
 
     if isinstance(process, str):
         print process
@@ -62,4 +66,5 @@ if __name__ == "__main__":
 
     sys.stderr.write(process.stderr.read())
     sys.stderr.flush()
+    sys.exit(0)
 
