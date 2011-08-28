@@ -21,12 +21,15 @@
 #########################################################################
 
 from subprocess import Popen, PIPE
+import textwrap
+import re
+import string
 
 def _run_command_general (program_commands, command, args):
     command_list = program_commands + [command] + args
-    command = Popen(command_list, 
-                    stdin = PIPE, stdout = PIPE, stderr = PIPE)
-    return command
+    out = Popen(command_list, 
+                stdin = PIPE, stdout = PIPE, stderr = PIPE)
+    return out
 
 
 def _run_command_locally (nmconfig, command, args):
@@ -76,4 +79,10 @@ def alter_json_objects(json_structure, fn_lst):
         for elem in json_structure:
             out.append(alter_json_objects(elem, fn_lst))
         return out
+
+def parse_hook_string(hook_string):
+    unwrapped_string = textwrap.fill(hook_string)
+    split_string = re.split(r'(.*?[^\\]);', unwrapped_string)
+    cleaned_up_list = [string.strip(s) for s in split_string if s]
+    return cleaned_up_list
 
