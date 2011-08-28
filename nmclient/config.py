@@ -156,11 +156,11 @@ class NotmuchClientConfig(object):
         if not hasattr(self, "_notmuch_config"):
             if self.account and self._config_parser.has_option(self.account, 
                                                                "notmuch_config"):
-                self._notmuch_bin = self._config_parser.get(self.account, 
+                self._notmuch_config = self._config_parser.get(self.account, 
                                                             "notmuch_config")
             else:
-                self._notmuch_bin = None
-        return self._notmuch
+                self._notmuch_config = None
+        return self._notmuch_config
 
     @property
     def aliases(self):
