@@ -1,4 +1,4 @@
-# -*-  coding: utf-8  -*-
+# -*- coding: utf-8  -*-
 #########################################################################
 # command.py: classes for intercepting and possibly altering notmuch    #
 # commands                                                              #
@@ -120,6 +120,21 @@ class NotmuchNew (NotmuchCommand):
     def __init__(self, nmconfig, args):
         super(NotmuchNew, self).__init__(nmconfig, args)
         self.command = "new"
+
+    def run (self):
+        out = self._run_command(self.command, self.filter_args())
+        for hook in self.new_hooks:
+            split_hook = hook.split()
+            if split_hook[0] == "notmuch": 
+                split_hook = split_hook[1:]
+            if split_hook[0] != "tag":
+                return "Hook must be a tag for now"
+            else:
+                hook_command = NotmuchCommand.make_command(self.config, split_hook)
+                hook_command.run()
+        if self.new_hooks:
+            out += (" Ran %d hooks." % len(self.new_hooks))
+        return out
 
 
 class NotmuchShow (NotmuchCommand):
@@ -305,6 +320,3 @@ class NotmuchShow (NotmuchCommand):
             return  self._run_raw()
         else:
             return self._run_command(self.command, self.filter_args())
-
-
-        

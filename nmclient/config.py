@@ -163,16 +163,16 @@ class NotmuchClientConfig(object):
         return self._notmuch_config
 
     @property
-    def hooks(self):
-        if not hasattr(self, "_hooks"):
+    def new_hooks(self):
+        if not hasattr(self, "_new_hooks"):
             if self.account and self._config_parser.has_option(self.account, 
-                                                               "hooks"):
+                                                               "new-hooks"):
                 hook_string = self._config_parser.get(self.account, 
-                                                      "hooks")
-                self._hooks = parse_hook_string(hook_string)
+                                                      "new-hooks")
+                self._new_hooks = parse_hook_string(hook_string)
             else:
-                self._hooks = []
-        return self._hooks
+                self._new_hooks = []
+        return self._new_hooks
 
 
     @property
