@@ -49,21 +49,22 @@ if __name__ == "__main__":
                 sys.stdout.write("Can't make cache file at %s" % nmconfig.cache)
         args = sys.argv[1:]
         command = NotmuchCommand.make_command(nmconfig, args)
-        process = command.run()
+        processes = command.run()
     except NotmuchClientConfigError as err:
         sys.stderr.write("Problem reading config file:\n%s" % err)
         sys.exit(1)
 
-    if isinstance(process, str):
-        sys.stdout.write(process)
+    if isinstance(processes, str):
+        sys.stdout.write(processes)
         sys.exit(0)
 
-    while True:
-        nextline = process.stdout.readline()
-        if (nextline == '' and  process.poll != None):
-            break
-        sys.stdout.write(nextline)
-        sys.stdout.flush()
+    for proc in processes:
+        while True:
+            nextline = proc.stdout.readline()
+            if (nextline == '' and  proc.poll != None):
+                break
+            sys.stdout.write(nextline)
+            sys.stdout.flush()
 
     sys.stderr.write(process.stderr.read())
     sys.stderr.flush()

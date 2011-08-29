@@ -98,13 +98,13 @@ class NotmuchCommand (object):
 
     def _run_command(self, command, args):
         if self.config.remote:
-            return _run_command_over_ssh (self.config, 
+            return [_run_command_over_ssh (self.config, 
                                           command, 
-                                          args)
+                                          args)]
         else:
-            return _run_command_locally (self.config, 
+            return [_run_command_locally (self.config, 
                                          command, 
-                                         args)
+                                         args)]
 
     def run (self):
         return self._run_command(self.command, self.filter_args())
@@ -131,10 +131,10 @@ class NotmuchNew (NotmuchCommand):
                 return "Hook must be a tag for now"
             else:
                 hook_command = NotmuchCommand.make_command(self.config, split_hook)
-                hook_command.run()
-        if self.new_hooks:
-            out += (" Ran %d hooks." % len(self.new_hooks))
+                out.append(hook_command.run())
         return out
+        
+    
 
 
 class NotmuchShow (NotmuchCommand):
